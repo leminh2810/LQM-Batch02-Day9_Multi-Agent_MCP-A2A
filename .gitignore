@@ -25,14 +25,20 @@ logs/
 # Local tool state
 .claude/
 
-# Local copied repositories
-Lqm-Day08_RAG_pipeline_cohort2/
-
 # Generated caches and vector stores
 **cache**
 **/chroma_db/
 **/vectorstore/
 *.sqlite3
+
+# Day 8 local/runtime artifacts
+Lqm-Day08_RAG_pipeline_cohort2/.git-day8-backup/
+Lqm-Day08_RAG_pipeline_cohort2/.deepeval/
+Lqm-Day08_RAG_pipeline_cohort2/.pytest_cache/
+Lqm-Day08_RAG_pipeline_cohort2/ven08/
+Lqm-Day08_RAG_pipeline_cohort2/__pycache__/
+Lqm-Day08_RAG_pipeline_cohort2/**/__pycache__/
+Lqm-Day08_RAG_pipeline_cohort2/data/converted_pdfs/
 
 # OS/editor noise
 .DS_Store

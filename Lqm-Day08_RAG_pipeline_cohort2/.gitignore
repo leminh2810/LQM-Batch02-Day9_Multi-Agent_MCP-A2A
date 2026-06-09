@@ -1,0 +1,21 @@
+.env
+pycache
+__pycache__
+*.pyc
+ven08/
+# Ignore the .env file which may contain sensitive information
+# Ignore Python bytecode files and cache directories
+# You can add more patterns to ignore as needed
+# For example, if you have a virtual environment directory, you can ignore it like this:
+venv/
+# Ignore log files
+*.log
+
+# Ignore any other files or directories that should not be tracked by Git
+# For example, if you have a directory for temporary files, you can ignore it like this:
+temp/
+# Ignore any files related to IDEs or editors
+.idea/
+chroma-logs/
+.vscode/
+

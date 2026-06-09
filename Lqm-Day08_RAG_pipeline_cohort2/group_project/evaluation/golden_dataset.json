@@ -1,0 +1,92 @@
+[
+  {
+    "id": "legal_001",
+    "question": "Luật Phòng, chống ma túy 2021 định nghĩa chất ma túy là gì?",
+    "expected_answer": "Chất ma túy là chất gây nghiện, chất hướng thần được quy định trong danh mục chất ma túy do Chính phủ ban hành.",
+    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 2"
+  },
+  {
+    "id": "legal_002",
+    "question": "Người sử dụng trái phép chất ma túy có thể bị áp dụng những biện pháp quản lý nào?",
+    "expected_answer": "Người sử dụng trái phép chất ma túy có thể bị lập hồ sơ quản lý, xét nghiệm chất ma túy, quản lý tại xã phường thị trấn và áp dụng biện pháp cai nghiện phù hợp theo quy định.",
+    "expected_context": "Luật Phòng, chống ma túy 2021, Chương IV"
+  },
+  {
+    "id": "legal_003",
+    "question": "Luật Phòng, chống ma túy 2021 quy định các hình thức cai nghiện ma túy nào?",
+    "expected_answer": "Các hình thức cai nghiện gồm cai nghiện tự nguyện tại gia đình, cộng đồng hoặc cơ sở cai nghiện ma túy, và cai nghiện bắt buộc tại cơ sở cai nghiện ma túy.",
+    "expected_context": "Luật Phòng, chống ma túy 2021, Chương V"
+  },
+  {
+    "id": "legal_004",
+    "question": "Ai có trách nhiệm phòng, chống ma túy theo Luật Phòng, chống ma túy 2021?",
+    "expected_answer": "Phòng, chống ma túy là trách nhiệm của cá nhân, gia đình, cơ quan, tổ chức và toàn xã hội; trong đó cơ quan nhà nước tổ chức thực hiện theo chức năng, nhiệm vụ được giao.",
+    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 4 và các điều về trách nhiệm"
+  },
+  {
+    "id": "legal_005",
+    "question": "Hành vi sử dụng trái phép chất ma túy lần đầu thường bị xử lý như thế nào?",
+    "expected_answer": "Trường hợp sử dụng trái phép chất ma túy lần đầu, chưa đủ yếu tố cấu thành tội phạm, thường bị xử phạt vi phạm hành chính và có thể bị áp dụng biện pháp quản lý, cai nghiện theo quy định.",
+    "expected_context": "Báo PLO về vụ Miu Lê và quy định xử lý hành vi sử dụng trái phép chất ma túy"
+  },
+  {
+    "id": "legal_006",
+    "question": "Tội tàng trữ trái phép chất ma túy được xử lý theo nhóm tội nào trong Bộ luật Hình sự?",
+    "expected_answer": "Tội tàng trữ trái phép chất ma túy thuộc nhóm các tội phạm về ma túy trong Bộ luật Hình sự, thường được viện dẫn tại Điều 249.",
+    "expected_context": "Bộ luật Hình sự 2015, sửa đổi 2017, Điều 249"
+  },
+  {
+    "id": "legal_007",
+    "question": "Tội tổ chức sử dụng trái phép chất ma túy khác gì với hành vi chỉ sử dụng trái phép chất ma túy?",
+    "expected_answer": "Tổ chức sử dụng trái phép chất ma túy là hành vi tạo điều kiện, chuẩn bị địa điểm, phương tiện hoặc lôi kéo người khác sử dụng nên có thể bị truy cứu trách nhiệm hình sự; còn hành vi chỉ sử dụng trái phép trong một số trường hợp bị xử phạt hành chính nếu chưa đủ yếu tố tội phạm.",
+    "expected_context": "Bộ luật Hình sự và bài PLO phân tích khi nào sử dụng ma túy bị xử lý hình sự"
+  },
+  {
+    "id": "news_001",
+    "question": "Theo bài PLO, vụ Miu Lê được phát hiện ở đâu và khi nào?",
+    "expected_answer": "Theo PLO, vụ việc được phát hiện khoảng 12 giờ 30 ngày 10-5-2026 tại khu vực bãi tắm Tùng Thu, thôn 2 Cát Bà, đặc khu Cát Hải, Hải Phòng.",
+    "expected_context": "article_01.md, PLO, vụ ca sĩ Miu Lê"
+  },
+  {
+    "id": "news_002",
+    "question": "Trong vụ Miu Lê, lực lượng chức năng phát hiện bao nhiêu người có hành vi sử dụng trái phép chất ma túy?",
+    "expected_answer": "Theo bài PLO, lực lượng chức năng phát hiện 6 người có hành vi sử dụng trái phép chất ma túy.",
+    "expected_context": "article_01.md, PLO, vụ ca sĩ Miu Lê"
+  },
+  {
+    "id": "news_003",
+    "question": "Bài Kenh14 cho biết Miu Lê dương tính với những chất nào?",
+    "expected_answer": "Bài Kenh14 cho biết Lê Ánh Nhật, tức Miu Lê, dương tính với Methamphetamine, Ketamine và MDMA.",
+    "expected_context": "article_03.md, Kenh14, mục ca sĩ Miu Lê"
+  },
+  {
+    "id": "news_004",
+    "question": "Theo Kenh14, Sơn Ngọc Minh bị khởi tố về tội gì?",
+    "expected_answer": "Theo Kenh14, Sơn Ngọc Minh bị khởi tố về tội tổ chức sử dụng trái phép chất ma túy.",
+    "expected_context": "article_03.md, Kenh14, mục ca sĩ Sơn Ngọc Minh"
+  },
+  {
+    "id": "news_005",
+    "question": "Theo Kenh14, người mẫu An Tây bị truy tố về những tội nào?",
+    "expected_answer": "Theo Kenh14, An Tây bị truy tố về hai tội tàng trữ trái phép chất ma túy và tổ chức sử dụng trái phép chất ma túy.",
+    "expected_context": "article_03.md, Kenh14, mục người mẫu An Tây"
+  },
+  {
+    "id": "news_006",
+    "question": "Theo Kenh14, Chi Dân bị bắt khẩn cấp vào ngày nào và vì hành vi gì?",
+    "expected_answer": "Theo Kenh14, ngày 14/11/2024 Công an TP.HCM bắt khẩn cấp Chi Dân để điều tra các hành vi tàng trữ và tổ chức sử dụng ma túy.",
+    "expected_context": "article_03.md, Kenh14, mục ca sĩ Chi Dân"
+  },
+  {
+    "id": "news_007",
+    "question": "Theo bài aFamily, diễn viên Hữu Tín bị tuyên mức án bao nhiêu?",
+    "expected_answer": "Theo aFamily, ngày 28/4/2023 TAND quận 8 TP.HCM tuyên phạt Trần Hữu Tín 7 năm 6 tháng tù về tội tổ chức sử dụng trái phép chất ma túy.",
+    "expected_context": "article_02.md, aFamily, mục diễn viên hài Trần Hữu Tín"
+  },
+  {
+    "id": "news_008",
+    "question": "Theo bài aFamily, Châu Việt Cường lĩnh án bao nhiêu năm tù?",
+    "expected_answer": "Theo aFamily, Châu Việt Cường lĩnh án 13 năm tù; bài viết cũng nêu sau đó anh được giảm án 2 năm.",
+    "expected_context": "article_02.md, aFamily, mục ca sĩ Châu Việt Cường"
+  }
+]
