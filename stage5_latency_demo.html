@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage 5 A2A Latency Demo</title>
+  <style>
+    :root {
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      color: #182026;
+      background: #f4f6f8;
+      --green: #16775a;
+      --blue: #2468a2;
+      --red: #b64b3c;
+      --line: #cbd3dd;
+    }
+    body {
+      margin: 0;
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 28px 0 12px;
+      font-size: 20px;
+    }
+    p {
+      line-height: 1.55;
+    }
+    .subtle {
+      color: #5b6673;
+      margin-top: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .metric, .panel {
+      background: #fff;
+      border: 1px solid #dbe1e8;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .metric .label {
+      color: #5b6673;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .metric .value {
+      font-size: 34px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+    .value.good {
+      color: var(--green);
+    }
+    .value.bad {
+      color: var(--red);
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    button {
+      border: 1px solid #b9c2cc;
+      background: #fff;
+      color: #1b252e;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    button.active {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
+    .agent {
+      position: relative;
+      min-height: 96px;
+      background: #fff;
+      border: 1px solid #dbe1e8;
+      border-radius: 8px;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    .agent.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(36, 104, 162, .15);
+    }
+    .agent.done {
+      border-color: var(--green);
+    }
+    .agent .name {
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .agent .note {
+      color: #5b6673;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .agent::after {
+      content: "->";
+      position: absolute;
+      right: -18px;
+      top: 40px;
+      color: #748091;
+      font-weight: 900;
+    }
+    .agent:last-child::after {
+      content: "";
+    }
+    .parallel {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid #dbe1e8;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid #e7ebf0;
+      vertical-align: top;
+    }
+    th {
+      background: #eef2f5;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    code, pre {
+      font-family: Consolas, Monaco, monospace;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #101820;
+      color: #e7edf3;
+      border-radius: 8px;
+      padding: 14px;
+      overflow: auto;
+    }
+    @media (max-width: 860px) {
+      .grid, .flow, .parallel {
+        grid-template-columns: 1fr;
+      }
+      .parallel {
+        grid-column: auto;
+      }
+      .agent::after {
+        content: "";
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Stage 5 A2A Agent Interaction & Latency Demo</h1>
+  <p class="subtle">Demo dựa trên kết quả chạy thật bằng <code>uv run python test_client.py</code>.</p>
+
+  <section class="grid">
+    <div class="metric">
+      <div class="label">Baseline latency</div>
+      <div class="value bad">45.915s</div>
+    </div>
+    <div class="metric">
+      <div class="label">Optimized latency</div>
+      <div class="value good">25.339s</div>
+    </div>
+    <div class="metric">
+      <div class="label">Latency reduced</div>
+      <div class="value good">44.8%</div>
+    </div>
+  </section>
+
+  <h2>Luồng tương tác agent</h2>
+  <div class="panel">
+    <div class="controls">
+      <button id="baselineBtn" class="active">Baseline</button>
+      <button id="optimizedBtn">Optimized</button>
+      <button id="playBtn">Play Flow</button>
+    </div>
+    <p id="modeText">
+      Baseline: Customer Agent dùng ReAct LLM để quyết định delegate, gọi Law Agent,
+      rồi dùng LLM thêm lần nữa để trình bày final response.
+    </p>
+    <div class="flow" id="flow">
+      <div class="agent" data-step="0">
+        <div class="name">Client</div>
+        <div class="note">Gửi câu hỏi qua A2A test client.</div>
+      </div>
+      <div class="agent" data-step="1">
+        <div class="name">Customer</div>
+        <div class="note" id="customerNote">LLM quyết định gọi Law Agent.</div>
+      </div>
+      <div class="agent" data-step="2">
+        <div class="name">Registry</div>
+        <div class="note">discover legal_question, tax_question, compliance_question.</div>
+      </div>
+      <div class="agent" data-step="3">
+        <div class="name">Law</div>
+        <div class="note">Phân tích pháp lý, routing, aggregate.</div>
+      </div>
+      <div class="parallel">
+        <div class="agent" data-step="4">
+          <div class="name">Tax</div>
+          <div class="note">Tax specialist, depth=2.</div>
+        </div>
+        <div class="agent" data-step="4">
+          <div class="name">Compliance</div>
+          <div class="note">Compliance specialist, depth=2.</div>
+        </div>
+      </div>
+      <div class="agent" data-step="5">
+        <div class="name">Final</div>
+        <div class="note" id="finalNote">Customer LLM trình bày lại câu trả lời.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Kết quả đo</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Run</th>
+        <th>Command</th>
+        <th>Latency</th>
+        <th>Ghi chú</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Baseline</td>
+        <td><code>uv run python test_client.py</code></td>
+        <td><strong>45.915s</strong></td>
+        <td>Customer Agent còn dùng ReAct LLM ở đầu và cuối request.</td>
+      </tr>
+      <tr>
+        <td>Optimized</td>
+        <td><code>uv run python test_client.py</code></td>
+        <td><strong>25.339s</strong></td>
+        <td>Customer Agent delegate trực tiếp tới Law Agent qua Registry/A2A.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Phương án giảm latency đã áp dụng</h2>
+  <div class="panel">
+    <p>
+      Tối ưu được áp dụng trong <code>customer_agent/agent_executor.py</code>:
+      với câu hỏi pháp lý, Customer Agent bỏ qua vòng ReAct LLM trung gian và gọi trực tiếp
+      <code>discover("legal_question")</code> rồi delegate tới Law Agent.
+    </p>
+    <p>
+      Lý do hợp lý: system prompt cũ đã yêu cầu Customer Agent luôn dùng
+      <code>delegate_to_legal_agent</code> cho câu hỏi pháp lý substantive, nên bước để LLM
+      quyết định delegate là dư thừa trong demo này.
+    </p>
+    <pre>Baseline path:
+Client -> Customer LLM -> Registry -> Law -> Tax + Compliance -> Law aggregate -> Customer LLM -> Client
+
+Optimized path:
+Client -> Customer direct delegate -> Registry -> Law -> Tax + Compliance -> Law aggregate -> Client</pre>
+  </div>
+
+  <h2>Log evidence</h2>
+  <div class="panel">
+    <p>Baseline output được lưu tại <code>logs/benchmark_baseline.txt</code>.</p>
+    <p>Optimized output được lưu tại <code>logs/benchmark_optimized.txt</code>.</p>
+    <p>Trace optimized:</p>
+    <pre>trace=0e8cd198-0115-422d-bac8-6d468360f244
+Customer direct delegation
+LawAgent executing depth=1
+Routing decision: needs_tax=True needs_compliance=True
+Tax Agent returned 437 chars
+Compliance Agent returned 2524 chars</pre>
+  </div>
+</main>
+
+<script>
+  const baselineBtn = document.getElementById("baselineBtn");
+  const optimizedBtn = document.getElementById("optimizedBtn");
+  const playBtn = document.getElementById("playBtn");
+  const modeText = document.getElementById("modeText");
+  const customerNote = document.getElementById("customerNote");
+  const finalNote = document.getElementById("finalNote");
+  const agents = Array.from(document.querySelectorAll(".agent"));
+  let mode = "baseline";
+
+  function setMode(next) {
+    mode = next;
+    baselineBtn.classList.toggle("active", mode === "baseline");
+    optimizedBtn.classList.toggle("active", mode === "optimized");
+    agents.forEach(agent => agent.classList.remove("active", "done"));
+
+    if (mode === "baseline") {
+      modeText.textContent = "Baseline: Customer Agent dùng ReAct LLM để quyết định delegate, gọi Law Agent, rồi dùng LLM thêm lần nữa để trình bày final response.";
+      customerNote.textContent = "LLM quyết định gọi Law Agent.";
+      finalNote.textContent = "Customer LLM trình bày lại câu trả lời.";
+    } else {
+      modeText.textContent = "Optimized: Customer Agent bỏ qua ReAct LLM trung gian và delegate trực tiếp tới Law Agent qua Registry/A2A.";
+      customerNote.textContent = "Direct delegation, không gọi LLM.";
+      finalNote.textContent = "Trả thẳng kết quả aggregate từ Law Agent.";
+    }
+  }
+
+  async function play() {
+    agents.forEach(agent => agent.classList.remove("active", "done"));
+    const maxStep = 5;
+    for (let step = 0; step <= maxStep; step++) {
+      agents.forEach(agent => {
+        const value = Number(agent.dataset.step);
+        agent.classList.toggle("active", value === step);
+        if (value < step) agent.classList.add("done");
+      });
+      await new Promise(resolve => setTimeout(resolve, mode === "baseline" ? 650 : 430));
+    }
+    agents.forEach(agent => {
+      agent.classList.remove("active");
+      agent.classList.add("done");
+    });
+  }
+
+  baselineBtn.addEventListener("click", () => setMode("baseline"));
+  optimizedBtn.addEventListener("click", () => setMode("optimized"));
+  playBtn.addEventListener("click", play);
+</script>
+</body>
+</html>

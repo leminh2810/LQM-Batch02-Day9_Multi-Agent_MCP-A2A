@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Legal Multi-Agent A2A Visualizer</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0e1528;
+      --page: #11172d;
+      --panel: #1b2435;
+      --panel-2: #121a2b;
+      --field: #0a1020;
+      --border: #3a4a63;
+      --border-soft: #29384f;
+      --text: #edf4ff;
+      --muted: #9eb1cc;
+      --purple: #9b7cff;
+      --blue: #4ba3ff;
+      --green: #00d58a;
+      --red: #ff4f5e;
+      --yellow: #ffb42c;
+      --cyan: #39d7ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1220px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 26px 0 34px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 28px;
+      align-items: start;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      color: var(--purple);
+      font-size: 28px;
+      line-height: 1.25;
+    }
+
+    .subtitle {
+      max-width: 360px;
+      color: #8fb3d9;
+      line-height: 1.45;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 16px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 0 13px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #172033;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .chip.mode {
+      border-color: var(--yellow);
+      color: #ffd88a;
+      box-shadow: 0 0 0 1px rgba(255, 180, 44, 0.16);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .chip.online .dot,
+    .node.online .node-dot,
+    .switch.on .knob {
+      background: var(--green);
+    }
+
+    .chip.offline .dot,
+    .node.offline .node-dot {
+      background: var(--red);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 28px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+
+    .card-inner {
+      padding: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 18px;
+      font-size: 19px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .control-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #121b2d;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .switch {
+      position: relative;
+      width: 38px;
+      height: 22px;
+      border: 0;
+      border-radius: 999px;
+      background: #38465d;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .switch .knob {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #c6cfdd;
+      transition: transform 0.16s ease;
+    }
+
+    .switch.on {
+      background: #0a9f72;
+    }
+
+    .switch.on .knob {
+      transform: translateX(16px);
+    }
+
+    .label {
+      margin: 20px 0 10px;
+      color: #8fb3d9;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .agent-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+    }
+
+    .agent-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: #111a2c;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .agent-row.full {
+      grid-column: 1 / -1;
+    }
+
+    .mini-switch {
+      width: 32px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--red);
+      position: relative;
+    }
+
+    .mini-switch::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 0.16s ease;
+    }
+
+    .agent-row.online .mini-switch {
+      background: var(--green);
+    }
+
+    .agent-row.online .mini-switch::after {
+      transform: translateX(13px);
+    }
+
+    .scenario-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .scenario {
+      min-height: 31px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: #121b2d;
+      color: #b9c7dc;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .question-row {
+      display: grid;
+      grid-template-columns: 1fr 132px;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    textarea {
+      min-height: 44px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--field);
+      color: var(--text);
+      padding: 12px 14px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .primary {
+      min-height: 44px;
+      border: 0;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #326dff, #49a8ff);
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .secondary {
+      min-height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #121b2d;
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .danger {
+      background: #482331;
+      border-color: #7c3544;
+      color: #ffd7dc;
+    }
+
+    .log-box, .report-box {
+      min-height: 230px;
+      max-height: 300px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #040814;
+      padding: 12px;
+      color: #dce8f8;
+      font-family: Consolas, "SFMono-Regular", monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .log-box .warn { color: var(--yellow); }
+    .log-box .ok { color: var(--green); }
+    .log-box .info { color: var(--blue); }
+    .log-box .err { color: var(--red); }
+
+    .visual {
+      position: relative;
+      height: 410px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #10182a;
+      overflow: hidden;
+    }
+
+    svg.links {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .link {
+      fill: none;
+      stroke: var(--purple);
+      stroke-width: 3;
+      stroke-dasharray: 8 9;
+      opacity: 0.9;
+    }
+
+    .link.dim {
+      stroke: #4a5873;
+      opacity: 0.5;
+    }
+
+    .node {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: #182236;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      box-shadow: inset 0 0 28px rgba(255,255,255,0.03);
+    }
+
+    .node.online {
+      border-color: var(--green);
+      box-shadow: 0 0 34px rgba(0, 213, 138, 0.26), inset 0 0 22px rgba(0, 213, 138, 0.08);
+    }
+
+    .node.offline {
+      border-color: var(--red);
+      box-shadow: 0 0 20px rgba(255, 79, 94, 0.18);
+    }
+
+    .node.running {
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .node strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .node small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .time-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      margin-top: 10px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #052f30;
+      color: var(--green);
+      border: 1px solid var(--green);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .node.client { left: 36px; top: 164px; }
+    .node.customer { left: 158px; top: 164px; }
+    .node.law { left: 280px; top: 164px; }
+    .node.tax { right: 34px; top: 42px; }
+    .node.compliance { right: 34px; top: 164px; }
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 22px;
+    }
+
+    .metric {
+      min-height: 118px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #121a2b;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 14px;
+    }
+
+    .metric.optimized {
+      border-color: #148b7f;
+      background: #112a31;
+    }
+
+    .metric span {
+      color: #91a6c2;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin: 8px 0;
+      font-size: 31px;
+      color: var(--red);
+    }
+
+    .metric.optimized strong {
+      color: var(--green);
+    }
+
+    .metric small {
+      color: var(--muted);
+    }
+
+    .saving {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-size: 12px;
+    }
+
+    .answer {
+      min-height: 330px;
+      max-height: 440px;
+    }
+
+    .notes {
+      color: #c7d8ef;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .notes strong {
+      color: var(--text);
+    }
+
+    .notes ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .topbar, .grid { grid-template-columns: 1fr; }
+      .question-row { grid-template-columns: 1fr; }
+      .visual { height: 560px; }
+      .node.client { left: 24px; top: 28px; }
+      .node.customer { left: calc(50% - 55px); top: 128px; }
+      .node.law { right: 24px; top: 228px; left: auto; }
+      .node.tax { left: 24px; top: 348px; right: auto; }
+      .node.compliance { left: calc(50% - 55px); top: 348px; right: auto; }
+      svg.links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <h1>Legal Multi-Agent A2A Visualizer</h1>
+        <div class="subtitle">Mô phỏng và trực quan hóa tương tác liên kết phân tầng giữa các Agent qua A2A Protocol</div>
+      </div>
+      <div class="chips">
+        <span class="chip mode"><span class="dot"></span>Chế độ: Mô Phỏng (Offline)</span>
+        <span class="chip" data-chip="registry"><span class="dot"></span>Registry (:10000)</span>
+        <span class="chip" data-chip="customer_agent"><span class="dot"></span>Customer Agent (:10100)</span>
+        <span class="chip" data-chip="law_agent"><span class="dot"></span>Law Agent (:10101)</span>
+        <span class="chip" data-chip="tax_agent"><span class="dot"></span>Tax Agent (:10102)</span>
+        <span class="chip" data-chip="compliance_agent"><span class="dot"></span>Compliance Agent (:10103)</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="card-inner">
+          <h2>💡 Interactive Playground</h2>
+          <div class="control-strip">
+            <span>⚡ Chế độ Tối ưu Latency (Bypass Lớp LLM Customer)</span>
+            <button class="switch on" id="optimize-switch" title="Customer direct delegation đang bật mặc định"><span class="knob"></span></button>
+          </div>
+
+          <div class="label">🛡 Trạng thái hoạt động agents (test fault tolerance)</div>
+          <div class="agent-grid">
+            <div class="agent-row" data-row="customer_agent"><span>Customer Agent</span><span class="mini-switch"></span></div>
+            <div class="agent-row" data-row="law_agent"><span>Law Agent</span><span class="mini-switch"></span></div>
+            <div class="agent-row" data-row="tax_agent"><span>Tax Agent</span><span class="mini-switch"></span></div>
+            <div class="agent-row" data-row="compliance_agent"><span>Compliance Agent</span><span class="mini-switch"></span></div>
+          </div>
+
+          <div class="scenario-row">
+            <button class="scenario" data-question="If a company breaks a contract and avoids taxes, what are the legal and regulatory consequences?">Hợp đồng & Thuế</button>
+            <button class="scenario" data-question="A company leaked customer personal data and may violate GDPR. What are the compliance consequences?">Rủi ro dữ liệu Compliance</button>
+            <button class="scenario" data-question="A company breached an NDA, avoided taxes, and ignored SEC compliance rules. What happens?">Vi phạm NDA & Thuế</button>
+          </div>
+
+          <div class="question-row">
+            <textarea id="question">If a company breaks a contract and avoids taxes, what are the legal and regulatory consequences?</textarea>
+            <button class="primary" id="run-test">⚡ Gửi Câu Hỏi</button>
+          </div>
+
+          <div class="footer-actions">
+            <button class="secondary" id="start-services">Start services</button>
+            <button class="secondary danger" id="stop-services">Stop services</button>
+            <button class="secondary" id="refresh">Refresh</button>
+            <select class="secondary" id="log-file" aria-label="Log file">
+              <option value="all">all logs</option>
+              <option value="customer_agent.err.log">customer_agent.err.log</option>
+              <option value="law_agent.err.log">law_agent.err.log</option>
+              <option value="tax_agent.err.log">tax_agent.err.log</option>
+              <option value="compliance_agent.err.log">compliance_agent.err.log</option>
+              <option value="registry.err.log">registry.err.log</option>
+            </select>
+          </div>
+
+          <h2 style="margin-top: 22px;">🧾 Live Trace Logs</h2>
+          <div class="log-box" id="logs">Loading...</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-inner">
+          <h2>🌐 Active Flow Visualizer</h2>
+          <div class="visual">
+            <svg class="links" viewBox="0 0 620 410" preserveAspectRatio="none">
+              <path class="link" d="M88 214 C130 214 145 214 176 214"></path>
+              <path class="link" d="M270 214 C300 214 315 214 350 214"></path>
+              <path class="link dim" d="M402 204 C450 126 454 86 520 86"></path>
+              <path class="link" d="M402 214 C448 214 470 214 520 214"></path>
+            </svg>
+            <div class="node client online" data-node="client">
+              <div><strong>Client</strong><small>Cửa sổ kiểm thử</small><span class="time-pill" id="client-time">0.1s</span></div>
+            </div>
+            <div class="node customer" data-node="customer_agent">
+              <div><strong>Customer</strong><small>Cổng :10100</small><span class="time-pill" id="customer-time">0.0s</span></div>
+            </div>
+            <div class="node law" data-node="law_agent">
+              <div><strong>Law Agent</strong><small>Cổng :10101</small><span class="time-pill" id="law-time">-</span></div>
+            </div>
+            <div class="node tax" data-node="tax_agent">
+              <div><strong>Tax Agent</strong><small>Cổng :10102</small><span class="time-pill" id="tax-time">-</span></div>
+            </div>
+            <div class="node compliance" data-node="compliance_agent">
+              <div><strong>Compliance</strong><small>Cổng :10103</small><span class="time-pill" id="compliance-time">-</span></div>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <span>Latency chưa tối ưu</span>
+              <strong>45.9s</strong>
+              <small>7 cuộc gọi LLM tuần tự</small>
+            </div>
+            <div class="metric optimized">
+              <span>Latency đã tối ưu</span>
+              <strong id="optimized-latency">-</strong>
+              <small>Customer bypass + prompt ngắn</small>
+              <div class="saving" id="saving">Chờ lượt chạy mới</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-inner">
+          <h2>📋 Báo cáo tổng hợp cuối cùng</h2>
+          <div class="report-box answer" id="answer">Chưa có kết quả. Bấm "Gửi Câu Hỏi" để chạy full Stage 5.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-inner">
+          <h2>❓ Latency của Stage 5 là bao nhiêu và cách tối ưu hóa?</h2>
+          <div class="notes">
+            <p><strong>Latency thực tế baseline:</strong> 45.9 giây cho một câu hỏi end-to-end.</p>
+            <p><strong>Phương án giảm latency đã áp dụng:</strong> Customer Agent bỏ vòng LLM ReAct trung gian và delegate trực tiếp sang Law Agent. Tax Agent cũng trả lời ngắn hơn để giảm token sinh ra.</p>
+            <ul>
+              <li>Giảm một lượt gọi LLM tại Customer Agent.</li>
+              <li>Giữ Registry discovery và A2A delegation thật.</li>
+              <li>Dashboard này đo lại latency mỗi lần chạy và hiển thị kết quả bên trên.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const BASELINE_SECONDS = 45.915;
+    const API_BASE = "http://127.0.0.1:8088";
+    const serviceNames = ["registry", "customer_agent", "law_agent", "tax_agent", "compliance_agent"];
+    const logsEl = document.getElementById("logs");
+    const answerEl = document.getElementById("answer");
+    const runBtn = document.getElementById("run-test");
+    const logSelect = document.getElementById("log-file");
+    let lastOutput = "";
+
+    async function api(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, options);
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      return res.json();
+    }
+
+    function markStatus(services, running) {
+      let online = 0;
+      serviceNames.forEach(name => {
+        const isOnline = Boolean(services[name] && services[name].running);
+        if (isOnline) online += 1;
+
+        document.querySelectorAll(`[data-chip="${name}"], [data-row="${name}"], [data-node="${name}"]`).forEach(el => {
+          el.classList.toggle("online", isOnline);
+          el.classList.toggle("offline", !isOnline);
+          el.classList.toggle("running", running && isOnline && name !== "registry");
+        });
+      });
+
+      const modeChip = document.querySelector(".chip.mode");
+      modeChip.innerHTML = online === 5
+        ? '<span class="dot"></span>Chế độ: Live A2A'
+        : '<span class="dot"></span>Chế độ: Mô Phỏng (Offline)';
+      modeChip.classList.toggle("online", online === 5);
+    }
+
+    function renderLogs(text) {
+      const escaped = (text || "No log content yet.")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      logsEl.innerHTML = escaped
+        .replace(/(ERROR|failed|Lỗi|error)/gi, '<span class="err">$1</span>')
+        .replace(/(INFO|HTTP Request|Discovered|Registered)/g, '<span class="info">$1</span>')
+        .replace(/(returned|complete|thành công|200 OK)/gi, '<span class="ok">$1</span>')
+        .replace(/(WARNING|unavailable|retrying)/gi, '<span class="warn">$1</span>');
+      logsEl.scrollTop = logsEl.scrollHeight;
+    }
+
+    function extractAnswer(output) {
+      if (!output) return "";
+      const responseMarker = "RESPONSE:";
+      const idx = output.indexOf(responseMarker);
+      if (idx >= 0) {
+        return output.slice(idx + responseMarker.length).replace(/=+/g, "").trim();
+      }
+      const failed = output.match(/Request failed:[\s\S]*/);
+      return failed ? failed[0].trim() : output.trim();
+    }
+
+    function updateMetrics(run) {
+      const elapsed = run.elapsed_seconds;
+      const latencyText = elapsed ? `${elapsed.toFixed ? elapsed.toFixed(1) : elapsed}s` : "-";
+      document.getElementById("optimized-latency").textContent = latencyText;
+      document.getElementById("law-time").textContent = elapsed ? `${Math.max(elapsed - 2, 0).toFixed(1)}s` : "-";
+      document.getElementById("tax-time").textContent = run.running ? "..." : "-";
+      document.getElementById("compliance-time").textContent = run.running ? "..." : "-";
+
+      if (elapsed) {
+        const saved = Math.max(BASELINE_SECONDS - elapsed, 0);
+        const pct = BASELINE_SECONDS ? (saved / BASELINE_SECONDS) * 100 : 0;
+        document.getElementById("saving").textContent = `Tiết kiệm ~${pct.toFixed(1)}% thời gian`;
+      }
+    }
+
+    async function refreshStatus() {
+      const data = await api("/api/status");
+      markStatus(data.services, data.run.running);
+      runBtn.disabled = data.run.running;
+      updateMetrics(data.run);
+
+      if (data.trace_ids && data.trace_ids.length) {
+        const latest = data.trace_ids[data.trace_ids.length - 1];
+        document.querySelector(".subtitle").textContent = `Trace mới nhất: ${latest}`;
+      }
+
+      const optimizeSwitch = document.getElementById("optimize-switch");
+      optimizeSwitch.classList.toggle("on", Boolean(data.optimization_enabled));
+
+      if (data.run.output && data.run.output !== lastOutput) {
+        lastOutput = data.run.output;
+        const answer = extractAnswer(data.run.output);
+        answerEl.textContent = answer || data.run.output;
+      }
+    }
+
+    async function refreshLogs() {
+      const file = encodeURIComponent(logSelect.value);
+      const data = await api(`/api/logs?file=${file}`);
+      renderLogs(data.text);
+    }
+
+    function showError(error) {
+      renderLogs(
+        "Không kết nối được dashboard API ở http://127.0.0.1:8088\n\n" +
+        "Chạy lệnh này và giữ terminal mở:\n" +
+        ".\\.venv\\Scripts\\python.exe agent_dashboard.py\n\n" +
+        String(error && error.message ? error.message : error)
+      );
+    }
+
+    document.getElementById("start-services").addEventListener("click", async () => {
+      try {
+        renderLogs("Đang start services...");
+        const data = await api("/api/start-services", { method: "POST" });
+        renderLogs(data.message + "\n\nĐợi vài giây rồi hệ thống sẽ tự refresh.");
+        setTimeout(refreshStatus, 2000);
+        setTimeout(refreshLogs, 2500);
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    document.getElementById("stop-services").addEventListener("click", async () => {
+      try {
+        const data = await api("/api/stop-services", { method: "POST" });
+        renderLogs(data.message);
+        await refreshStatus();
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    document.getElementById("refresh").addEventListener("click", async () => {
+      try {
+        await refreshStatus();
+        await refreshLogs();
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    runBtn.addEventListener("click", async () => {
+      try {
+        answerEl.textContent = "Đang chạy full Stage 5...";
+        renderLogs("Đã gửi câu hỏi. Đang theo dõi logs từ các agents...");
+        await api("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: document.getElementById("question").value.trim(),
+            optimized: document.getElementById("optimize-switch").classList.contains("on")
+          })
+        });
+        await refreshStatus();
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    document.querySelectorAll(".scenario").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("question").value = button.dataset.question;
+      });
+    });
+
+    document.getElementById("optimize-switch").addEventListener("click", event => {
+      const enabled = !event.currentTarget.classList.contains("on");
+      event.currentTarget.classList.toggle("on", enabled);
+      renderLogs(`Đang ${enabled ? "bật" : "tắt"} tối ưu latency và restart Customer Agent...`);
+      api("/api/optimization", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled })
+      })
+        .then(data => {
+          renderLogs(data.message);
+          return refreshStatus();
+        })
+        .catch(showError);
+    });
+
+    document.querySelectorAll("[data-row]").forEach(row => {
+      row.addEventListener("click", async () => {
+        try {
+          const service = row.dataset.row;
+          const currentlyOnline = row.classList.contains("online");
+          const action = currentlyOnline ? "stop" : "start";
+          renderLogs(`Đang ${action === "start" ? "start" : "stop"} ${service}...`);
+          const data = await api("/api/service", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ service, action })
+          });
+          renderLogs(data.message);
+          await refreshStatus();
+          await refreshLogs();
+        } catch (error) {
+          showError(error);
+        }
+      });
+    });
+
+    logSelect.addEventListener("change", refreshLogs);
+
+    refreshStatus().then(refreshLogs).catch(showError);
+    setInterval(() => refreshStatus().catch(showError), 1600);
+    setInterval(() => refreshLogs().catch(showError), 4200);
+  </script>
+</body>
+</html>

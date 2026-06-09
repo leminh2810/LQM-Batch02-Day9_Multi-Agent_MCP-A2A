@@ -1,5 +1,45 @@
-.venv
+# Environment
 .env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+Lqm-Day08_RAG_pipeline_cohort2/ven08/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs and runtime output
+logs/
+*.log
+*.pid
+
+# Local tool state
+.claude/
+
+# Local copied repositories
+Lqm-Day08_RAG_pipeline_cohort2/
+
+# Generated caches and vector stores
 **cache**
-.claude
+**/chroma_db/
+**/vectorstore/
+*.sqlite3
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Keep exercise solutions visible while hiding other local solution drafts
 **SOLUTION**
+!exercises/SOLUTIONS.md
