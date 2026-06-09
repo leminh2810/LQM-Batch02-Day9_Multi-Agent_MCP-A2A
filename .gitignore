@@ -48,4 +48,5 @@ Thumbs.db
 
 # Keep exercise solutions visible while hiding other local solution drafts
 **SOLUTION**
+!lab.solution.md
 !exercises/SOLUTIONS.md
